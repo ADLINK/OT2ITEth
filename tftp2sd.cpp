@@ -5,6 +5,23 @@
 #define PUT 1
 #define GET 0
 
+/* Define a base directory for TFTP access
+ * ATTENTION: This code does NOT check for sandboxing,
+ * i.e. '..' in paths is not checked! */
+#ifndef LWIP_TFTP_EXAMPLE_BASE_DIR
+#define LWIP_TFTP_EXAMPLE_BASE_DIR ""
+#endif
+
+/* Define this to a file to get via tftp client */
+#ifndef LWIP_TFTP_EXAMPLE_CLIENT_FILENAME
+#define LWIP_TFTP_EXAMPLE_CLIENT_FILENAME "test.bin"
+#endif
+
+/* Define this to a server IP string */
+#ifndef LWIP_TFTP_EXAMPLE_CLIENT_REMOTEIP
+#define LWIP_TFTP_EXAMPLE_CLIENT_REMOTEIP "192.168.0.233"
+#endif
+
 static char full_filename[256];
 FILE* tftp_file = nullptr;
 File tftp_sd_file;
@@ -19,7 +36,7 @@ void *tftp_open_file(const char* fname, u8_t is_write)
   snprintf(full_filename, sizeof(full_filename), "%s%s", LWIP_TFTP_EXAMPLE_BASE_DIR, fname);
   full_filename[sizeof(full_filename)-1] = 0;
 
-  if (!SD-samd5x.begin(true)) 
+  if (!SD.begin(true)) 
   {
     //Serial.println("SD card initialization failed!");        
     return 0;
@@ -30,10 +47,10 @@ void *tftp_open_file(const char* fname, u8_t is_write)
 
   switch (is_write) {
   case PUT: // tftp put
-    if (SD-samd5x.exists(full_filename)) {
-      SD-samd5x.remove(full_filename);
+    if (SD.exists(full_filename)) {
+      SD.remove(full_filename);
     }
-    tftp_sd_file = SD-samd5x.open(full_filename, FILE_WRITE);
+    tftp_sd_file = SD.open(full_filename, FILE_WRITE);
     tftp_sd_file.seek(0);
     tftp_write_index = 0;
 
@@ -41,13 +58,13 @@ void *tftp_open_file(const char* fname, u8_t is_write)
     break;
 
   case GET: // tftp get
-    if (!SD-samd5x.exists(full_filename)) {
+    if (!SD.exists(full_filename)) {
       //Serial.println("File doesn't exist in SD card !");
       return 0;
     } else {
       tftp_read_index = 0;
     }
-    tftp_sd_file = SD-samd5x.open(full_filename);
+    tftp_sd_file = SD.open(full_filename);
     tftp_sd_file.seek(0);
 
     result = tftp_sd_file.read(&sd_file_buffer[0], MAX_FILE_SIZE);

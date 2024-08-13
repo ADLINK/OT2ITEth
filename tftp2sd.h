@@ -1,7 +1,10 @@
+#ifndef _TFTP2SD_H
+#define _TFTP2SD_H
+
 #include <stdio.h>
-#include "/tftp_client.h"
+#include "lwip/tftp_client.h"
 #include "lwip/tftp_server.h"
-#include "src/SD-samd5x.h"
+#include "SD-samd5x.h"
 
 void* tftp_open(const char* fname, const char* mode, u8_t is_write);
 void tftp_close(void* file_handler);
@@ -18,3 +21,5 @@ const struct tftp_context tftp = {
 };
 
 void ot2it_tftp_example_init_server(void);
+
+#endif // _TFTP2SD_H
